@@ -15,6 +15,24 @@ def _format_timestamp(timestamp):
     except (ValueError, TypeError):
         return str(timestamp)
 
+def render_conversation_text(conversation_history, session_id):
+    """Render a plain-text transcript suitable for later qualitative analysis."""
+    exported_at = datetime.now(timezone.utc).isoformat()
+    lines = [
+        "TeachCL Conversation Transcript",
+        f"Session ID: {session_id}",
+        f"Exported at: {_format_timestamp(exported_at)}",
+        "",
+    ]
+    for index, message in enumerate(conversation_history, start=1):
+        role = message.get("role", "unknown")
+        label = {"user": "Teacher", "assistant": "AI Assistant"}.get(role, role)
+        lines.extend([
+            f"[{index}] {label} | {_format_timestamp(message.get('timestamp'))}",
+            str(message.get("content", "")),
+            "",
+        ])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def save_conversation(
@@ -50,7 +68,8 @@ def save_conversation(
 
     # Readable format for researchers
     md_path = output_path / f"conversation_{session_id}.md"
-
+    txt_path = output_path / f"conversation_{session_id}.txt"
+    
     lines = [
         f"# Conversation Log",
         "",
@@ -87,9 +106,15 @@ def save_conversation(
     with md_path.open("w", encoding="utf-8") as file:
         file.write("\n".join(lines))
 
+    txt_path.write_text(
+        render_conversation_text(conversation_history, session_id),
+        encoding="utf-8",
+    )
+
     return {
         "json_path": str(json_path),
         "markdown_path": str(md_path),
+        "text_path": str(txt_path),
     }
 
 
