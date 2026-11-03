@@ -6,7 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from conversation_export import save_analysis, save_conversation
+from conversation_export import render_conversation_text, save_analysis, save_conversation
 from feedback_generator import generate_feedback
 from interaction_tracker import CODE_LABELS, code_interaction
 from llm_client import MODEL_NAME, call_openai, conversation_input
@@ -89,7 +89,18 @@ if user_input:
     except Exception as error:
         st.error(f"Could not generate a response: {error}")
 
-
+if st.session_state.conversation_history:
+    st.download_button(
+        "Download conversation transcript (.txt)",
+        data=render_conversation_text(
+            st.session_state.conversation_history,
+            st.session_state.research_session_id,
+        ),
+        file_name=f"conversation_{st.session_state.research_session_id}.txt",
+        mime="text/plain",
+        help="Save a plain-text copy on your device for later analysis.",
+    )
+    
 st.divider()
 st.subheader("Review this collaboration")
 st.write("Analyze teacher interaction codes, identify a session-level interaction pattern, and generate a reflective feedback prompt.")
