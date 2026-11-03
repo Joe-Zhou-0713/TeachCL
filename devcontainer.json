@@ -1,0 +1,31 @@
+{
+  "name": "TeachCL Python",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "app.py",
+        "visualization_feedback_scripts_py/app.py",
+        "visualization_scripts/app.py"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "postCreateCommand": "if [ -f requirements.txt ]; then python -m venv .venv && .venv/bin/python -m pip install --upgrade pip && .venv/bin/python -m pip install -r requirements.txt; elif [ -f visualization_feedback_scripts_py/requirements.txt ]; then python -m venv visualization_feedback_scripts_py/.venv && visualization_feedback_scripts_py/.venv/bin/python -m pip install --upgrade pip && visualization_feedback_scripts_py/.venv/bin/python -m pip install -r visualization_feedback_scripts_py/requirements.txt; elif [ -f visualization_scripts/requirements.txt ]; then python -m venv visualization_scripts/.venv && visualization_scripts/.venv/bin/python -m pip install --upgrade pip && visualization_scripts/.venv/bin/python -m pip install -r visualization_scripts/requirements.txt; else echo 'requirements.txt not found'; exit 1; fi",
+  "postAttachCommand": "if [ -f app.py ]; then .venv/bin/python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8501 --server.enableCORS false --server.enableXsrfProtection false; elif [ -f visualization_feedback_scripts_py/app.py ]; then visualization_feedback_scripts_py/.venv/bin/python -m streamlit run visualization_feedback_scripts_py/app.py --server.address 0.0.0.0 --server.port 8501 --server.enableCORS false --server.enableXsrfProtection false; elif [ -f visualization_scripts/app.py ]; then visualization_scripts/.venv/bin/python -m streamlit run visualization_scripts/app.py --server.address 0.0.0.0 --server.port 8501 --server.enableCORS false --server.enableXsrfProtection false; else echo 'app.py not found'; fi",
+  "forwardPorts": [
+    8501
+  ],
+  "portsAttributes": {
+    "8501": {
+      "label": "TeachCL app",
+      "onAutoForward": "openPreview"
+    }
+  }
+}
